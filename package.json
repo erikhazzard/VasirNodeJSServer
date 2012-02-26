@@ -1,0 +1,13 @@
+{
+    "name": "VasirEngine-Node-Server", 
+    "version": "0.0.1", 
+    "private": true, 
+    "dependencies": {
+        "winston": ">= 0.5.x",
+		"winston-mail": ">= 0.1.x",
+		"socket.io": ">= 0.8.7",
+		"redis": ">= 0.7.x",
+		"vows": ">= 0.6.1",
+		"ntwitter": ">= 0.2.10"
+  }
+}

@@ -1,26 +1,7 @@
 //Global vars
-var app = require('http').createServer(handler), 
-    io = require('socket.io').listen(app), 
-    fs = require('fs')
-
-var zeromq = require("zeromq");
-
-//List on port 1337
-app.listen(1337);
-
-//Generic handler func
-function handler(req, res) {
-  fs.readFile(__dirname + '/index.html',
-  function (err, data) {
-    if (err) {
-      res.writeHead(500);
-      return res.end('Error loading index.html');
-    }
-
-    res.writeHead(200);
-    res.end(data);
-  });
-}
+var io = require('socket.io').listen(1337);
+var redis = require('redis');
+var client = redis.createClient();
 
 //----------------------------------------------------------------------------
 //
@@ -32,32 +13,31 @@ function handler(req, res) {
 //---------------------------------------
 var VASIR_ENGINE = {
     'clients': {}
-}
+};
 
-//---------------------------------------
-//Socket function
-//---------------------------------------
-//Setup ZMQ socket
-var zmq_socket = zeromq.createSocket('pull');
-zmq_socket.connect("tcp://127.0.0.1:5001");
-
+//============================================================================
+//Socket IO / Redis
+//============================================================================
 io.sockets.on('connection', function (socket) {
-    socket.on('set_name', function (name) {
-        socket.set('name', name, function () {
-            socket.emit('ready');
-        });
+    //Subscribe to the game_state:world channel
+    var subscribe = redis.createClient();
+    subscribe.subscribe('game_state:world');
+
+    //When a message is published to the game_state:world channel,
+    //  emit a socket event which will get pushed to the client
+    //  with socket.io
+    subscribe.on('message', function(channel, msg){
+        socket.emit('game_state:update', msg);
+        //console.log('emitted', msg);
     });
 
-    socket.on('msg', function () {
-        socket.get('name', function (err, name) {
-            console.log('Chat message by ', name);
-        });
+    //When the client disconnects, close the subscription
+    socket.on('disconnect', function(){
+        subscribe.quit();
     });
 
-    //----------------------------------------------------------------------------
-    //ZeroMQ setup
-    //----------------------------------------------------------------------------
-    zmq_socket.on('message', function(data) {
-        socket.send(data);
+    //Lisen to other event
+    socket.on('my other event', function (data) {
+        //console.log('from client', data);
     });
 });
