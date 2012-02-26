@@ -1,7 +1,11 @@
 //Global vars
-var io = require('socket.io').listen(1337);
-var redis = require('redis');
-var client = redis.createClient();
+var io = require('socket.io').listen(1337),
+    redis = require('redis'),
+    client = redis.createClient(),
+    winston = require('winston');
+
+//Set SocketIO Log level (TODO: Use winston)
+io.set('log level', 1);
 
 //----------------------------------------------------------------------------
 //
