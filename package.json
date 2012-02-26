@@ -7,6 +7,7 @@
 		"winston-mail": ">= 0.1.x",
 		"socket.io": ">= 0.8.7",
 		"redis": ">= 0.7.x",
+        "hiredis": ">= 0.1.14",
 		"vows": ">= 0.6.1",
 		"ntwitter": ">= 0.2.10"
   }
